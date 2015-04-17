@@ -6,6 +6,7 @@ window.requestAnimationFrame=(function(){
 })();
 
 
+
 //----- ADIVINAR EL NÚMERO -----//
 
  var guessinGame = (function(){
@@ -77,6 +78,50 @@ window.requestAnimationFrame=(function(){
 
 
 var spaceInvaders = (function(){
-    
+    //'Stage' se encarga de mostrar gráficos y sprites.
+    var stage = new PIXI.Stage(0x000000);
+    //'renderer' genera el elemento <canvas> y después se lo apenda(¿?).
+    //'renderer.view' devuelve un objeto <canvas>.
+    var renderer = PIXI.autoDetectRenderer(252, 432);
+    $('#invader').append(renderer.view);
+
+    //Cargo los assets del juego.
+    var loader = new PIXI.AssetLoader(['images/alien.png', 
+                                       'images/missile.png',
+                                       'images/ship.png',
+                                       'images/background.png']);
+    //Indica a 'loader' que cargue los assets.
+    loader.load();
+    //Indica que al completar la carga, ejecute 'setup'.
+    loader.onComplete = setup;
+
+    function setup () {
+        var textures = [];
+        textures[0] = PIXI.TextureCache['images/alien.png'];
+        textures[1] = PIXI.TextureCache['images/missile.png'];
+        textures[2] = PIXI.TextureCache['images/ship.png'];
+        textures[3] = PIXI.TextureCache['images/background.png'];
+
+        var sprites = {
+            alien: new PIXI.Sprite(textures[0]),
+            missile: new PIXI.Sprite(textures[1]),
+            ship: new PIXI.Sprite(textures[2]),
+            background: new PIXI.Sprite(textures[3])
+        };
+
+        stage.addChild(sprites.background);
+        stage.addChild(sprites.alien);
+        stage.addChild(sprites.missile);
+        stage.addChild(sprites.ship);
+
+        sprites.alien.position.set(115, 50);
+        sprites.ship.position.set(115, 380);
+        sprites.missile.position.set(115, 200);
+
+        renderer.render(stage);
+    };
+
+
+
 })();
 
