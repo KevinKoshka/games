@@ -94,20 +94,30 @@ var spaceInvaders = (function(){
     loader.load();
     //Indica que al completar la carga, ejecute 'setup'.
     loader.onComplete = setup;
+    var sprites = {};
 
+    //Tamaño de tile.
+    var sprSize = 36;
+    //Ancho canvas.
+    var stWidth = 252;
+    //Alto canvas.
+    var stHeight = 432;
+
+    var state;
+
+    //Función setup parecida a la de Processing.
     function setup () {
+
         var textures = [];
         textures[0] = PIXI.TextureCache['images/alien.png'];
         textures[1] = PIXI.TextureCache['images/missile.png'];
         textures[2] = PIXI.TextureCache['images/ship.png'];
         textures[3] = PIXI.TextureCache['images/background.png'];
 
-        var sprites = {
-            alien: new PIXI.Sprite(textures[0]),
-            missile: new PIXI.Sprite(textures[1]),
-            ship: new PIXI.Sprite(textures[2]),
-            background: new PIXI.Sprite(textures[3])
-        };
+        sprites.alien = new PIXI.Sprite(textures[0]),
+        sprites.missile = new PIXI.Sprite(textures[1]),
+        sprites.ship = new PIXI.Sprite(textures[2]),
+        sprites.background = new PIXI.Sprite(textures[3])
 
         stage.addChild(sprites.background);
         stage.addChild(sprites.alien);
@@ -118,10 +128,31 @@ var spaceInvaders = (function(){
         sprites.ship.position.set(115, 380);
         sprites.missile.position.set(115, 200);
 
+        state = play;
+
+        //Se lo ejecuta acá para que tenga acceso al scope
+        //de setup.
+        draw();
+    };
+
+    function draw(){
+        //Recursión a 60FPS.
+        requestAnimationFrame(draw);
+
+        state();
+
         renderer.render(stage);
     };
 
+    //Gameplay.
+    function play(){
+        sprites.ship.vx = 5;
 
+        sprites.ship.x += sprites.ship.vx;
+        if(sprites.ship.x > stWidth){
+            sprites.ship.x = -sprSize;
+        };
+    };
 
 })();
 
