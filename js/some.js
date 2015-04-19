@@ -76,6 +76,21 @@ window.requestAnimationFrame=(function(){
 
 //----- SPACE INVADERS -----//
 
+//Hago foco en el canvas cuando el scroll de la ventana se
+//posiciona sobre este.
+/*
+var invader = $('#invader');
+var spaceInvader = $('#spaceInvader');
+var anotherThing = $('#anotherThing');
+
+$(window).scroll(function(){
+    console.log($(window).scrollTop());
+    if((spaceInvader.offset().top <= $(window).scrollTop()) && ($(window).scrollTop() <= anotherThing.offset().top)){
+        spaceInvader.focus();
+        console.log("focused");
+    }
+});
+*/
 
 var spaceInvaders = (function(){
     //'Stage' se encarga de mostrar gráficos y sprites.
@@ -107,6 +122,8 @@ var spaceInvaders = (function(){
 
     //Función setup parecida a la de Processing.
     function setup () {
+        //Asignación de teclas.
+        var left = keyboard(37), right = keyboard(39);
 
         var textures = [];
         textures[0] = PIXI.TextureCache['images/alien.png'];
@@ -124,9 +141,26 @@ var spaceInvaders = (function(){
         stage.addChild(sprites.missile);
         stage.addChild(sprites.ship);
 
+        sprites.ship.vx = 0;
+
         sprites.alien.position.set(115, 50);
         sprites.ship.position.set(115, 380);
         sprites.missile.position.set(115, 200);
+        //Funcionalidad de teclas.
+        left.press = function(){
+            sprites.ship.vx = -3;
+        }
+        left.release = function(){
+            sprites.ship.vx = 0;
+        }
+
+
+        right.press = function(){
+            sprites.ship.vx = 3;
+        }
+        right.release = function(){
+            sprites.ship.vx = 0;
+        }
 
         state = play;
 
@@ -135,6 +169,7 @@ var spaceInvaders = (function(){
         draw();
     };
 
+    //Loop principal.
     function draw(){
         //Recursión a 60FPS.
         requestAnimationFrame(draw);
@@ -146,13 +181,59 @@ var spaceInvaders = (function(){
 
     //Gameplay.
     function play(){
-        sprites.ship.vx = 5;
 
+        //sprites.ship.vx = 0;
         sprites.ship.x += sprites.ship.vx;
+
         if(sprites.ship.x > stWidth){
             sprites.ship.x = -sprSize;
+        } else if(sprites.ship.x < (-sprSize)){
+            sprites.ship.x = stWidth;
         };
-    };
+
+    }
+
+    //Función que maneja el teclado. Siempre los eventos deben apuntar
+    //a window.
+    function keyboard(keyCode) {
+        var key = {};
+        key.code = keyCode;
+        key.isDown = false;
+        key.isUp = true;
+        key.press = undefined;
+        key.release = undefined;
+        //The `downHandler`
+        key.downHandler = function(event) {
+            if (event.keyCode === key.code) {
+                if (key.isUp && key.press) key.press();
+                key.isDown = true;
+                key.isUp = false;
+            }
+            event.preventDefault();
+        };
+
+        //The `upHandler`
+        key.upHandler = function(event) {
+            if (event.keyCode === key.code) {
+                if (key.isDown && key.release) key.release();
+                key.isDown = false;
+                key.isUp = true;
+            }
+            event.preventDefault();
+        };
+        //Prueba propia de scopes.
+        var arriba = key.upHandler;
+        var abajo = key.downHandler;
+
+        //Attach event listeners
+        window.addEventListener(
+            "keydown", abajo.bind(key), false
+        );
+        window.addEventListener(
+            "keyup", arriba.bind(key), false
+        );
+        return key;
+    }
 
 })();
 
